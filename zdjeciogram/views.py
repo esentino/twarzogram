@@ -1,10 +1,7 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.forms import ModelForm
-from django.shortcuts import render
-
-# Create your views here.
-from django.views.generic import ListView, DetailView, CreateView
-
+from django.urls import reverse_lazy
+from django.views.generic import ListView, DetailView, FormView
+from zdjeciogram.forms import AddPhotoForm
 from zdjeciogram.models import Photo
 
 
@@ -17,12 +14,17 @@ class PhotoView(DetailView):
     model = Photo
 
 
-class AddPhotoView(LoginRequiredMixin, CreateView):
-    model = Photo
-    fields = ['path', 'description']
-
-    def form_valid(self, form: ModelForm):
-        path = form.cleaned_data['path']
+class AddPhotoView(LoginRequiredMixin, FormView):
+    form_class = AddPhotoForm
+    success_url = reverse_lazy('main')
+    template_name = 'zdjeciogram/photo_form.html'
+    def form_valid(self, form):
         description = form.cleaned_data['description']
-        user = self.request.user
-        p = Photo.objects.create(path=path, description=description, author_id = user.id)
+        path = form.cleaned_data['path']
+        Photo.objects.create(
+            description=description,
+            author=self.request.user,
+            path=path
+        )
+        return super(AddPhotoView, self).form_valid(form)
+

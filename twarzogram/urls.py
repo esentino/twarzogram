@@ -20,7 +20,7 @@ from zdjeciogram.views import MainView, PhotoView, AddPhotoView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('/', MainView.as_view, name='main'),
+    path('', MainView.as_view(), name='main'),
     path('photo/<int:pk>', PhotoView.as_view(), name='photo-detail'),
     path('photo/add', AddPhotoView.as_view(), name='add-new-foto')
 ]
